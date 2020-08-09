@@ -1,8 +1,10 @@
 package dev.wendyyanto.library
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.ViewStub
+import android.view.ViewTreeObserver
 import android.widget.LinearLayout
 import java.lang.IllegalArgumentException
 
@@ -18,6 +20,14 @@ class LazyLoadComponent @JvmOverloads constructor(
         ViewStub(context, attrs)
     }
 
+    private val componentRect by lazy {
+        Rect()
+    }
+
+    private lateinit var screenRect: Rect
+
+    private var isScrollListenerExist = false
+
     init {
         orientation = VERTICAL
         val typeArray = context.theme.obtainStyledAttributes(
@@ -29,13 +39,32 @@ class LazyLoadComponent @JvmOverloads constructor(
             if (layoutResId == 0) {
                 throw IllegalArgumentException(LAYOUT_RESOURCE_IS_INVALID)
             }
-            with (viewStub) {
+            with(viewStub) {
                 layoutResource = layoutResId
                 addView(this)
             }
         } finally {
             typeArray.recycle()
         }
+        setupListener()
     }
 
+    private fun setupListener() {
+        this.getGlobalVisibleRect(this.componentRect)
+        this.screenRect = Rect(0, 0, rootView.measuredWidth, rootView.height)
+        this.viewTreeObserver.addOnScrollChangedListener(object :
+            ViewTreeObserver.OnScrollChangedListener {
+            override fun onScrollChanged() {
+                if (isScrollListenerExist) return
+                isScrollListenerExist = true
+                if (!isViewShown()) return
+                viewStub.inflate()
+                viewTreeObserver.removeOnScrollChangedListener(this)
+            }
+        })
+    }
+
+    private fun isViewShown(): Boolean {
+        return this.componentRect.intersect(this.screenRect)
+    }
 }
