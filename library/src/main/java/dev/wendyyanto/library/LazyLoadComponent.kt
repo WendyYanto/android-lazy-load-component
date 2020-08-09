@@ -3,6 +3,8 @@ package dev.wendyyanto.library
 import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.Log
+import android.view.View
 import android.view.ViewStub
 import android.view.ViewTreeObserver
 import android.widget.LinearLayout
@@ -65,6 +67,7 @@ class LazyLoadComponent @JvmOverloads constructor(
     }
 
     private fun isViewShown(): Boolean {
+        // ToDo - screenRect doesn't cover until the bottom of layout
         return this.componentRect.intersect(this.screenRect)
     }
 }

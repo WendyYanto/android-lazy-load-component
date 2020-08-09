@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="LazyLoadComponent">
         <attr name="layout_id" format="reference" />
+        <attr name="parent_layout_id" format="reference" />
     </declare-styleable>
 </resources>
