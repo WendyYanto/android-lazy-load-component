@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewStub
 import android.view.ViewTreeObserver
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.LinearLayout
 import java.lang.IllegalArgumentException
 
@@ -26,9 +27,9 @@ class LazyLoadComponent @JvmOverloads constructor(
         Rect()
     }
 
-    private lateinit var screenRect: Rect
-
-    private var isScrollListenerExist = false
+    private lateinit var parentView: View
+    private var screenHeight: Int = -1
+    private var isInflated = false
 
     init {
         orientation = VERTICAL
@@ -48,26 +49,45 @@ class LazyLoadComponent @JvmOverloads constructor(
         } finally {
             typeArray.recycle()
         }
+        setupMeasuredHeight()
         setupListener()
     }
 
     private fun setupListener() {
-        this.getGlobalVisibleRect(this.componentRect)
-        this.screenRect = Rect(0, 0, rootView.measuredWidth, rootView.height)
         this.viewTreeObserver.addOnScrollChangedListener(object :
             ViewTreeObserver.OnScrollChangedListener {
             override fun onScrollChanged() {
-                if (isScrollListenerExist) return
-                isScrollListenerExist = true
                 if (!isViewShown()) return
-                viewStub.inflate()
+                loadComponent()
                 viewTreeObserver.removeOnScrollChangedListener(this)
             }
         })
     }
 
     private fun isViewShown(): Boolean {
-        // ToDo - screenRect doesn't cover until the bottom of layout
-        return this.componentRect.intersect(this.screenRect)
+        return (parentView.scrollY + screenHeight) >= componentRect.top
     }
+
+    private fun loadComponent() {
+        if (isInflated) return
+        layoutParams.height = LayoutParams.WRAP_CONTENT
+        viewStub.inflate()
+        isInflated = true
+    }
+
+    fun setParentView(view: View) {
+        parentView = view
+    }
+
+    private fun setupMeasuredHeight() {
+        this.viewTreeObserver.addOnGlobalLayoutListener(object :
+            OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                getGlobalVisibleRect(componentRect)
+                screenHeight = parentView.measuredHeight
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
+    }
+
 }

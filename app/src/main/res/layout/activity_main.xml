@@ -22,13 +22,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <dev.wendyyanto.library.LazyLoadComponent
+            android:id="@+id/llc"
             android:layout_width="match_parent"
             android:layout_height="10dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ll_dummy"
-            app:layout_id="@layout/layout_multiple_textview"
-            app:parent_layout_id="@id/cl_parent" />
+            app:layout_id="@layout/layout_multiple_textview" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
