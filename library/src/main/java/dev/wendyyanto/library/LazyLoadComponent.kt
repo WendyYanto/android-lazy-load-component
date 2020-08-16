@@ -3,13 +3,11 @@ package dev.wendyyanto.library
 import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.ViewStub
 import android.view.ViewTreeObserver
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.LinearLayout
-import java.lang.IllegalArgumentException
 
 class LazyLoadComponent @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -17,6 +15,7 @@ class LazyLoadComponent @JvmOverloads constructor(
 
     companion object {
         private const val LAYOUT_RESOURCE_IS_INVALID = "LAYOUT_RESOURCE_IS_INVALID"
+        private const val PARENT_RESOURCE_ID_IS_INVALID = "PARENT_RESOURCE_ID_IS_INVALID"
     }
 
     private val viewStub by lazy {
@@ -27,9 +26,10 @@ class LazyLoadComponent @JvmOverloads constructor(
         Rect()
     }
 
-    private lateinit var parentView: View
-    private var screenHeight: Int = -1
+    private var screenHeight = -1
+    private var parentResId = -1
     private var isInflated = false
+    private lateinit var parentView: View
 
     init {
         orientation = VERTICAL
@@ -38,9 +38,14 @@ class LazyLoadComponent @JvmOverloads constructor(
             R.styleable.LazyLoadComponent, 0, 0
         )
         try {
-            val layoutResId = typeArray.getResourceId(R.styleable.LazyLoadComponent_layout_id, 0)
-            if (layoutResId == 0) {
+            parentResId =
+                typeArray.getResourceId(R.styleable.LazyLoadComponent_parent_layout_id, -1)
+            val layoutResId = typeArray.getResourceId(R.styleable.LazyLoadComponent_layout_id, -1)
+            if (layoutResId == -1) {
                 throw IllegalArgumentException(LAYOUT_RESOURCE_IS_INVALID)
+            }
+            if (parentResId == -1) {
+                throw IllegalArgumentException(PARENT_RESOURCE_ID_IS_INVALID)
             }
             with(viewStub) {
                 layoutResource = layoutResId
@@ -49,11 +54,23 @@ class LazyLoadComponent @JvmOverloads constructor(
         } finally {
             typeArray.recycle()
         }
-        setupMeasuredHeight()
-        setupListener()
+        setupLayoutListener()
+        setupScrollListener()
     }
 
-    private fun setupListener() {
+    private fun setupLayoutListener() {
+        this.viewTreeObserver.addOnGlobalLayoutListener(object :
+            OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                getGlobalVisibleRect(componentRect)
+                parentView = rootView.findViewById(parentResId)
+                screenHeight = parentView.measuredHeight
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
+    }
+
+    private fun setupScrollListener() {
         this.viewTreeObserver.addOnScrollChangedListener(object :
             ViewTreeObserver.OnScrollChangedListener {
             override fun onScrollChanged() {
@@ -73,21 +90,6 @@ class LazyLoadComponent @JvmOverloads constructor(
         layoutParams.height = LayoutParams.WRAP_CONTENT
         viewStub.inflate()
         isInflated = true
-    }
-
-    fun setParentView(view: View) {
-        parentView = view
-    }
-
-    private fun setupMeasuredHeight() {
-        this.viewTreeObserver.addOnGlobalLayoutListener(object :
-            OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                getGlobalVisibleRect(componentRect)
-                screenHeight = parentView.measuredHeight
-                viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })
     }
 
 }
