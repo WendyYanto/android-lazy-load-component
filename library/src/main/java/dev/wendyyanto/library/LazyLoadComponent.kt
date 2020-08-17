@@ -40,15 +40,15 @@ class LazyLoadComponent @JvmOverloads constructor(
         try {
             parentResId =
                 typeArray.getResourceId(R.styleable.LazyLoadComponent_parent_layout_id, -1)
-            val layoutResId = typeArray.getResourceId(R.styleable.LazyLoadComponent_layout_id, -1)
-            if (layoutResId == -1) {
+            val layoutRes = typeArray.getResourceId(R.styleable.LazyLoadComponent_layout_res, -1)
+            if (layoutRes == -1) {
                 throw IllegalArgumentException(LAYOUT_RESOURCE_IS_INVALID)
             }
             if (parentResId == -1) {
                 throw IllegalArgumentException(PARENT_RESOURCE_ID_IS_INVALID)
             }
             with(viewStub) {
-                layoutResource = layoutResId
+                layoutResource = layoutRes
                 addView(this)
             }
         } finally {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="LazyLoadComponent">
-        <attr name="layout_id" format="reference" />
+        <attr name="layout_res" format="reference" />
         <attr name="parent_layout_id" format="reference" />
     </declare-styleable>
 </resources>
