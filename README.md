@@ -19,7 +19,7 @@ allprojects {
 2.  Add the dependency
 ```
 dependencies {
-  implementation 'com.github.WendyYanto:android-lazy-load-component:v1.0.0'
+  implementation 'com.github.WendyYanto:android-lazy-load-component:v1.1.0'
 }
 ```
 3. Include LazyLoadComponent in your XML layout (best recommended to use in `ScrollView`)
@@ -29,13 +29,13 @@ dependencies {
     android:layout_height="10dp" />
 ```
 4. Add the required attribute at LazyLoadComponent:
-- `app:layout_id`: The layout that is intended to be loaded lazily at runtime
+- `app:layout_res`: The layout that is intended to be loaded lazily at runtime
 - `app:parent_layout_id`: The root layout's ID (it is used for LazyLoadComponent to decide when to load at runtime if only it's already on the viewport or beyond)
 
 ```xml
 <dev.wendyyanto.library.LazyLoadComponent
     android:layout_width="match_parent"
     android:layout_height="10dp"
-    app:layout_id="@layout/layout_you_want_to_load_lazyily"
+    app:layout_res="@layout/layout_you_want_to_load_lazyily"
     app:parent_layout_id="@id/root_layout_id" />
 ```
