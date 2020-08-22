@@ -3,5 +3,8 @@
     <declare-styleable name="LazyLoadComponent">
         <attr name="layout_res" format="reference" />
         <attr name="parent_layout_id" format="reference" />
+        <attr name="image_placeholder" format="integer" />
+        <attr name="text_placeholder" format="string" />
+        <attr name="reset_padding_on_load" format="boolean" />
     </declare-styleable>
 </resources>
