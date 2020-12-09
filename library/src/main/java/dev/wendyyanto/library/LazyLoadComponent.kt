@@ -101,6 +101,8 @@ class LazyLoadComponent @JvmOverloads constructor(
                 parentView = rootView.findViewById(parentResId)
                 screenHeight = parentView.measuredHeight
                 viewTreeObserver.removeOnGlobalLayoutListener(this)
+                if (!isViewShown()) return
+                loadComponent()
             }
         })
     }
