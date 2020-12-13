@@ -19,7 +19,7 @@ allprojects {
 2.  Add the dependency
 ```
 dependencies {
-  implementation 'com.github.WendyYanto:android-lazy-load-component:v1.2.0'
+  implementation 'com.github.WendyYanto:android-lazy-load-component:v1.3.0'
 }
 ```
 3. Include LazyLoadComponent in your XML layout (best recommended to use in `ScrollView`)
